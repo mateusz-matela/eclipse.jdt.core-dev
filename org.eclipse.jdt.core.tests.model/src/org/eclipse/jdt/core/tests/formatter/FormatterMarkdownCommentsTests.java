@@ -301,18 +301,18 @@ public class FormatterMarkdownCommentsTests extends FormatterCommentsTests {
 	public void testMarkdownMultiSnippetCommentsWithoutCode() throws JavaModelException {
 		setComplianceLevel(CompilerOptions.VERSION_23);
 		String input = """
-				/// ``
+				/// ```
 				/// This is a random sentence
 				/// inside snippet
-				/// ``
+				/// ```
 				class Test20i {
 				}
 				""";
 		String expected = """
-				/// ``
+				/// ```
 				/// This is a random sentence
 				/// inside snippet
-				/// ``
+				/// ```
 				class Test20i {
 				}
 				""";
@@ -371,13 +371,13 @@ public class FormatterMarkdownCommentsTests extends FormatterCommentsTests {
 		setComplianceLevel(CompilerOptions.VERSION_23);
 		String input = """
 				/// Markdown Snippets 1
-				/// ``
+				/// ```
 				/// public class HelloWorld {
 				/// 	public static void main(String args) {
 				/// 			System.out.println("Hello World!");
 				/// 	}
 				/// }
-				/// ``
+				/// ```
 				///
 				/// Markdown Snippets 2
 				///
@@ -403,13 +403,13 @@ public class FormatterMarkdownCommentsTests extends FormatterCommentsTests {
 				""";
 		String expected = """
 				/// Markdown Snippets 1
-				/// ``
+				/// ```
 				/// public class HelloWorld {
 				/// 	public static void main(String args) {
-				/// 			System.out.println("Hello World!");
+				/// 		System.out.println("Hello World!");
 				/// 	}
 				/// }
-				/// ``
+				/// ```
 				///
 				/// Markdown Snippets 2
 				///
@@ -761,13 +761,14 @@ public class FormatterMarkdownCommentsTests extends FormatterCommentsTests {
 					///
 					///     ```		java
 					///     int x = 10;
-					///     System.out.println(x);
+					///     System.out.println	(x);
 					///     ```
 					class TestFakeFences {
 					}
 					""";
 		formatSource(input, expected);
 	}
+
 	public void testMarkdownUnclosedCodeFences() throws JavaModelException {
 		setComplianceLevel(CompilerOptions.VERSION_23);
 		String input = """
@@ -786,10 +787,98 @@ public class FormatterMarkdownCommentsTests extends FormatterCommentsTests {
 					/// 	public static void main(String args) {
 					/// 		System.out.println("ssdd World!");
 					/// 	}
-					/// }\s
+					/// }
 					class Mark61 {
 					}
 					""";
 		formatSource(input, expected);
 	}
+
+	public void testMarkdownFencedCodeInList() throws JavaModelException {
+		setComplianceLevel(CompilerOptions.VERSION_23);
+		String input = """
+					/// 1. three    four
+					/// 2. ```
+					///     hello  there
+					///       ```
+					/// 2. one     two
+					class Test {
+					}
+					""";
+		String expected = """
+					/// 1. three four
+					/// 2. ```
+					///     hello  there
+					///    ```
+					/// 2. one two
+					class Test {
+					}
+					""";
+		formatSource(input, expected);
+	}
+
+	public void testMarkdownFencedCodeInListWithClosingFenceTooFar() throws JavaModelException {
+		setComplianceLevel(CompilerOptions.VERSION_23);
+		String input = """
+					/// 1. three    four
+					/// 2. ```
+					///     hello  there
+					///        ```
+					///    2. one     two
+					class Test {
+					}
+					""";
+		String expected = """
+					/// 1. three four
+					/// 2. ```
+					///     hello  there
+					///        ```
+					///    2. one     two
+					class Test {
+					}
+					""";
+		formatSource(input, expected);
+	}
+
+	public void testMarkdownFencedCodeInListEndedByNextListItem() throws JavaModelException {
+		setComplianceLevel(CompilerOptions.VERSION_23);
+		String input = """
+					/// 1. three    four
+					/// 2. ```
+					///     hello  there
+					///        ```
+					/// 2. one     two
+					class Test {
+					}
+					""";
+		String expected = """
+					/// 1. three four
+					/// 2. ```
+					///     hello  there
+					///        ```
+					/// 2. one two
+					class Test {
+					}
+					""";
+		formatSource(input, expected);
+	}
+
+	public void testMarkdownWithEmptyLastLine() throws JavaModelException {
+		setComplianceLevel(CompilerOptions.VERSION_23);
+		String input = """
+					/// aaa
+					/// bbb
+					///\s
+					class Mark61 {
+					}
+					""";
+		String expected = """
+					/// aaa bbb
+					///\s
+					class Mark61 {
+					}
+					""";
+		formatSource(input, expected);
+	}
+
 }

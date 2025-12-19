@@ -419,8 +419,7 @@ public class TextEditsBuilder extends TokenTraverser {
 			text = adaptReplaceText(text, breaksToPreserve, true, regionEnd);
 			editEnd = regionEnd;
 		}
-		int length = editEnd - editStart < 0 ? 0 : editEnd - editStart;
-		return new ReplaceEdit(editStart, length, text);
+		return new ReplaceEdit(editStart, editEnd - editStart, text);
 	}
 
 	private boolean isOnlyWhitespace(String text) {
